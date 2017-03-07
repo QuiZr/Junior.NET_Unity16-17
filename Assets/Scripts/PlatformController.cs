@@ -18,8 +18,12 @@ public class PlatformController : MonoBehaviour
     [SerializeField]
     private int jumpForce = 300;
 
+    public Transform groundCheckPosition;
+
     // Rigibody tells Unity to enable physics on this game object.
     private Rigidbody2D localRigibody;
+
+    private bool goingLeft = true;
 
     void Start()
     {
@@ -34,8 +38,30 @@ public class PlatformController : MonoBehaviour
     /// <param name="wantToJump">True = jump</param>
     public void Move(float moveValue, bool wantToJump)
     {
+        // Make sure that our graphics are displayed in correct direction
+        if ((goingLeft && moveValue > 0) || (!goingLeft && moveValue < 0))
+        {
+            goingLeft = !goingLeft;
+            Flip();
+        }
+
+        bool canJump = false;
+
+        // Check if there is something beneeth our foot
+        Collider2D[] hits = Physics2D.OverlapCircleAll(groundCheckPosition.position, 0.1f);
+        foreach (Collider2D collider in hits)
+        {
+            if (collider.gameObject != gameObject)
+            {
+                // If there is, and that something is not us then we're
+                // standing on something! 
+                canJump = true;
+                break;
+            }
+        }
+
         // Jump
-        if (wantToJump)
+        if (wantToJump && canJump)
         {
             localRigibody.AddForce(new Vector2(0, jumpForce));
         }
@@ -44,5 +70,16 @@ public class PlatformController : MonoBehaviour
         float newHorizontalVelocity = moveValue * moveSpeed;
         Vector2 newVelocity = new Vector2(newHorizontalVelocity, localRigibody.velocity.y);
         localRigibody.velocity = newVelocity;
+    }
+
+    /// <summary>
+    /// Flip the player GameObject so that we won't have to
+    /// make 2 sets of animations for different rotation.
+    /// </summary>
+    void Flip()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 }
