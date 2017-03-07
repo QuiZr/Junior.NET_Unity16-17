@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Linq;
+using System;
 
 /// <summary>
 /// This whole class will be splitted into two separate ones.
@@ -23,6 +24,8 @@ public class PlatformController : MonoBehaviour
     // Rigibody tells Unity to enable physics on this game object.
     private Rigidbody2D thisRigidbody;
 
+    private bool goingLeft = true;
+
     // Use this for initialization (executes at object spawn).
     void Start()
     {
@@ -37,6 +40,11 @@ public class PlatformController : MonoBehaviour
     /// <param name="wantToJump">True = jump if able to</param>
     public void Move(float moveValue, bool wantToJump)
     {
+        if ((goingLeft && moveValue > 0) || (!goingLeft && moveValue < 0))
+        {
+            Flip(); 
+        }
+
         bool canJump = false;
 
         // Make a raycast at groundCheck GameObject position and check
@@ -64,5 +72,18 @@ public class PlatformController : MonoBehaviour
         Vector2 currentVelocity = thisRigidbody.velocity;
         Vector2 newVelocity = new Vector2(moveValue * maxMoveSpeed, currentVelocity.y);
         thisRigidbody.velocity = newVelocity;
+    }
+
+    /// <summary>
+    /// This method flips our character so that it get's displayed
+    /// properly.
+    /// </summary>
+    private void Flip()
+    {
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
+
+        goingLeft = !goingLeft;
     }
 }
