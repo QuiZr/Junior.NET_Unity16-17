@@ -20,6 +20,9 @@ public class PlatformController : MonoBehaviour
 
     public Transform groundCheckPosition;
 
+    // Animator component from GFX object
+    public Animator animator;
+
     // Rigibody tells Unity to enable physics on this game object.
     private Rigidbody2D localRigibody;
 
@@ -70,6 +73,11 @@ public class PlatformController : MonoBehaviour
         float newHorizontalVelocity = moveValue * moveSpeed;
         Vector2 newVelocity = new Vector2(newHorizontalVelocity, localRigibody.velocity.y);
         localRigibody.velocity = newVelocity;
+
+        // Set animator variables
+        animator.SetFloat("horizontalSpeed", Mathf.Abs(localRigibody.velocity.x));
+        animator.SetFloat("verticalSpeed", localRigibody.velocity.y);
+        animator.SetBool("isStanding", canJump);
     }
 
     /// <summary>
