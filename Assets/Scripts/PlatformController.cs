@@ -21,6 +21,9 @@ public class PlatformController : MonoBehaviour
     [SerializeField]
     private int jumpForce = 40;
 
+    // Our animator
+    public Animator animator;
+
     // Rigibody tells Unity to enable physics on this game object.
     private Rigidbody2D thisRigidbody;
 
@@ -42,7 +45,7 @@ public class PlatformController : MonoBehaviour
     {
         if ((goingLeft && moveValue > 0) || (!goingLeft && moveValue < 0))
         {
-            Flip(); 
+            Flip();
         }
 
         bool canJump = false;
@@ -72,6 +75,14 @@ public class PlatformController : MonoBehaviour
         Vector2 currentVelocity = thisRigidbody.velocity;
         Vector2 newVelocity = new Vector2(moveValue * maxMoveSpeed, currentVelocity.y);
         thisRigidbody.velocity = newVelocity;
+
+        // Update animator values, not every object has an animation
+        if (animator != null)
+        {
+            animator.SetBool("isStanding", canJump);
+            animator.SetFloat("verticalSpeed", thisRigidbody.velocity.y);
+            animator.SetFloat("horizontalSpeed", Mathf.Abs(thisRigidbody.velocity.x));
+        }
     }
 
     /// <summary>
